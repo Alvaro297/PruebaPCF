@@ -20,6 +20,6 @@ public interface StorageService {
 
 	void deleteAll();
 
-	void deleteAllbyName(String filename);
+	void deleteAllbyName(String pathName, String filename);
 
 }

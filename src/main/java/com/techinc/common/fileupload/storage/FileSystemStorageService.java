@@ -114,14 +114,19 @@ public class FileSystemStorageService implements StorageService {
 	}
 
 	@Override
-	public void deleteAllbyName(String filename) {
+	public void deleteAllbyName(String pathName, String filename) {
 		
-		Path file = load(filename);
+		Path file = this.rootLocation.toAbsolutePath();
 		//File fileToDelete = FileUtils.getFile(file.toAbsolutePath());
+		String fileName = file.toString();
+		
+		Path _newPath = Paths.get( fileName + "/"+ pathName + "/" + filename);
+		
+		
 		Resource resource;
 		try {
-			resource = new UrlResource(file.toUri());
-			Files.delete(file);
+			resource = new UrlResource(_newPath.toUri());
+			Files.delete(_newPath);
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

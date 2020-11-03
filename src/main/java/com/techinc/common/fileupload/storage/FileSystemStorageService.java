@@ -30,15 +30,27 @@ public class FileSystemStorageService implements StorageService {
 	}
 
 	@Override
-	public void store(MultipartFile file) {
+	public void store(MultipartFile file, String pathName) {
 		try {
 			if (file.isEmpty()) {
 				throw new StorageException("Failed to store empty file.");
 			}
-			Path destinationFile = this.rootLocation.resolve(
+			if (pathName.isEmpty()) {
+				throw new StorageException("Path Name is required.");
+			}
+			//TODO: crear el pathname
+			Path destinationFile = this.rootLocation.toAbsolutePath();
+
+				
+			String fileName = destinationFile.toString();
+			Path _newPath = Paths.get( fileName + "/"+ pathName);
+			destinationFile  = Files.createDirectories(_newPath);
+
+			destinationFile = destinationFile.resolve(
 					Paths.get(file.getOriginalFilename()))
 					.normalize().toAbsolutePath();
-			if (!destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
+		
+			if (destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
 				// This is a security check
 				throw new StorageException(
 						"Cannot store file outside current directory.");
@@ -56,7 +68,7 @@ public class FileSystemStorageService implements StorageService {
 	@Override
 	public Stream<Path> loadAll() {
 		try {
-			return Files.walk(this.rootLocation, 1)
+			return Files.walk(this.rootLocation, 2)
 				.filter(path -> !path.equals(this.rootLocation))
 				.map(this.rootLocation::relativize);
 		}
@@ -72,10 +84,15 @@ public class FileSystemStorageService implements StorageService {
 	}
 
 	@Override
-	public Resource loadAsResource(String filename) {
+	public Resource loadAsResource(String filename, String pathName) {
 		try {
-			Path file = load(filename);
-			Resource resource = new UrlResource(file.toUri());
+			Path file = this.rootLocation.toAbsolutePath();
+			
+			
+			String fileName = file.toString();
+			
+			Path _newPath = Paths.get( fileName + "/"+ pathName + "/" + filename);
+			Resource resource = new UrlResource(_newPath.toUri());
 			if (resource.exists() || resource.isReadable()) {
 				return resource;
 			}

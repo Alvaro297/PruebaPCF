@@ -1,6 +1,11 @@
 package com.techinc.common.fileupload;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import com.techinc.common.fileupload.storage.Archives;
 
 
 import javax.servlet.http.HttpServletRequest;
@@ -43,25 +48,42 @@ public class FileUploadController{
 		this.storageService = storageService;
 	}
 
-    @PostMapping("/api/uploadFile")
-	public String handleFileUpload(@RequestParam("file") MultipartFile file){
+	  @PostMapping("/api/uploadFile/{pathName}")
+		public String handleFileUpload(@RequestParam("file") MultipartFile file, @PathVariable String pathName){
 
-		storageService.store(file);
-		return 	"You successfully uploaded " + file.getOriginalFilename() + "!";
-    }
+			storageService.store(file, pathName);
+			return 	"You successfully uploaded " + file.getOriginalFilename() + "!";
+	    }
     
 
-    @GetMapping("/api/getFiles")
-    public Stream<Path> listUploadedFiles() {
+
+	@GetMapping("/api/getFiles")
+    public   List<String> listUploadedFiles() {
+        
         Stream<Path> filesInFolder = storageService.loadAll();
-        return filesInFolder;
+        
+        List<Path> result =   filesInFolder.sorted().collect(Collectors.toList());
+        List<String> items = new ArrayList<>();
+       
+        for(Path file: result) {
+        	 
+        	 if(file.getParent()!= null) {
+        		 items.add("http://localhost:8080/files/"+file.getParent()+"/"+ file.getFileName());
+        	 }
+
+        }
+        
+
+        
+        return items;
     }
-    
-    @GetMapping("/api/deleteAllFiles")
-    public String deleteUploadedFiles() {
-        storageService.deleteAll();
-        return "Files have been deleted!";
-    }
+   
+
+ //  
+ //   public String deleteUploadedFiles() {
+ //       storageService.deleteAll();
+ //       return "Files have been deleted!";
+ //   }
 
 
     @GetMapping("/deleteFile/{fileName:.+}")
@@ -70,11 +92,11 @@ public class FileUploadController{
         return "This file has been deleted!";
     }
 
-    @GetMapping("/files/{fileName:.+}")
+    @GetMapping("/files/{pathName:.+}/{fileName:.+}")
     @ResponseBody
-	public ResponseEntity<Resource> serveFile(@PathVariable String fileName, HttpServletRequest request) {
+	public ResponseEntity<Resource> serveFile(@PathVariable String pathName, @PathVariable String fileName,  HttpServletRequest request) {
 
-        Resource resource =  storageService.loadAsResource(fileName);
+        Resource resource =  storageService.loadAsResource(fileName, pathName);
         String contentType = null;
    
         try {

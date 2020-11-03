@@ -68,7 +68,7 @@ public class FileUploadController{
         for(Path file: result) {
         	 
         	 if(file.getParent()!= null) {
-        		 items.add("http://localhost:8080/files/"+file.getParent()+"/"+ file.getFileName());
+        		 items.add("http://localhost:8080/api/files/"+file.getParent()+"/"+ file.getFileName());
         	 }
 
         }
@@ -86,13 +86,13 @@ public class FileUploadController{
  //   }
 
 
-    @GetMapping("/deleteFile/{fileName:.+}")
+    @GetMapping("/api/deleteFile/{fileName:.+}")
     public String deleteUploadedFiles(@PathVariable String fileName) {
         storageService.deleteAllbyName(fileName);
         return "This file has been deleted!";
     }
 
-    @GetMapping("/files/{pathName:.+}/{fileName:.+}")
+    @GetMapping("/api/files/{pathName:.+}/{fileName:.+}")
     @ResponseBody
 	public ResponseEntity<Resource> serveFile(@PathVariable String pathName, @PathVariable String fileName,  HttpServletRequest request) {
 
@@ -102,7 +102,7 @@ public class FileUploadController{
         try {
             contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
         } catch (IOException e) {
-            // TODO Auto-generated catch block
+            
             e.printStackTrace();
         }
        

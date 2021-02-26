@@ -67,17 +67,9 @@ To change limits you ccould edit  application.properties
 * spring.servlet.multipart.max-request-size=1028KB -> Limits  to rq
 
 
-## Deployment
-
-TODO: Create a gitlab-ci file with this stages:
-
 ## Built With
 * [Maven](https://maven.apache.org/) - Dependency Management
 
-
-## Build-Images docker image in docker.techinc.com.mx 
-* [Docker] (https://docker.techinc.com.mx) - Private Repository
-* buld, push
 
 ## Contributing
 

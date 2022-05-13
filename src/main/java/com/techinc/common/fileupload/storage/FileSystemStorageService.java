@@ -4,10 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.util.stream.Stream;
 
 import org.apache.tomcat.util.http.fileupload.FileUtils;
@@ -38,7 +35,6 @@ public class FileSystemStorageService implements StorageService {
 			if (pathName.isEmpty()) {
 				throw new StorageException("Path Name is required.");
 			}
-			//TODO: crear el pathname
 			Path destinationFile = this.rootLocation.toAbsolutePath();
 
 				
@@ -66,9 +62,40 @@ public class FileSystemStorageService implements StorageService {
 	}
 
 	@Override
+	public void updatePrueba1(String file, String pathName) {
+		try {
+			if (file.isEmpty()) {
+				throw new StorageException("Failed to store empty file.");
+			}
+			if (pathName.isEmpty()) {
+				throw new StorageException("Path Name is required.");
+			}
+			Path destinationFile = this.rootLocation.toAbsolutePath();
+
+
+			String fileName = destinationFile.toString();
+			Path _newPath = Paths.get( fileName + "/"+ pathName);
+			destinationFile  = Files.createDirectories(_newPath);
+
+			destinationFile = destinationFile.resolve(
+							Paths.get(file))
+					.normalize().toAbsolutePath();
+
+			if (destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
+				// This is a security check
+				throw new StorageException(
+						"Cannot store file outside current directory.");
+			}
+		}
+		catch (IOException e) {
+			throw new StorageException("Failed to store file.", e);
+		}
+	}
+
+	@Override
 	public Stream<Path> loadAll() {
 		try {
-			return Files.walk(this.rootLocation, 2)
+			return Files.walk(this.rootLocation, 6)
 				.filter(path -> !path.equals(this.rootLocation))
 				.map(this.rootLocation::relativize);
 		}
@@ -92,6 +119,30 @@ public class FileSystemStorageService implements StorageService {
 			String fileName = file.toString();
 			
 			Path _newPath = Paths.get( fileName + "/"+ pathName + "/" + filename);
+			Resource resource = new UrlResource(_newPath.toUri());
+			if (resource.exists() || resource.isReadable()) {
+				return resource;
+			}
+			else {
+				throw new StorageFileNotFoundException(
+						"Could not read file: " + filename);
+
+			}
+		}
+		catch (MalformedURLException e) {
+			throw new StorageFileNotFoundException("Could not read file: " + filename, e);
+		}
+	}
+
+	@Override
+	public Resource loadAsResource(String filename, String pathName, String pathName2, String pathName3, String pathName4) {
+		try {
+			Path file = this.rootLocation.toAbsolutePath();
+
+
+			String fileName = file.toString();
+
+			Path _newPath = Paths.get( fileName + "/"+ pathName + "/" +pathName2+"/"+pathName3+"/"+pathName4+"/"+ filename);
 			Resource resource = new UrlResource(_newPath.toUri());
 			if (resource.exists() || resource.isReadable()) {
 				return resource;

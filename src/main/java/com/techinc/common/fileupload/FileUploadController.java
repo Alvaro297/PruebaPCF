@@ -1,24 +1,23 @@
 package com.techinc.common.fileupload;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import com.techinc.common.fileupload.storage.Archives;
 
 
 import javax.servlet.http.HttpServletRequest;
+import javax.swing.text.html.Option;
 
 
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,11 +54,17 @@ public class FileUploadController{
 			storageService.store(file, pathName);
 			return 	"You successfully uploaded " + file.getOriginalFilename() + "!";
 	    }
+    @PostMapping("/api/uploadFilePrueba/{pathName}")
+    public String updatePrueba1(@RequestParam("file") String file, @PathVariable String pathName){
+
+        storageService.updatePrueba1(file, pathName);
+        return 	"You successfully uploaded " + file + "!";
+    }
     
 
 
 	@GetMapping("/api/getFiles")
-    public   List<String> listUploadedFiles() {
+    public  List<String> listUploadedFiles() {
         
         Stream<Path> filesInFolder = storageService.loadAll();
         
@@ -69,7 +74,7 @@ public class FileUploadController{
         for(Path file: result) {
         	 
         	 if(file.getParent()!= null) {
-        		 items.add("http://localhost:8080/api/files/"+file.getParent()+"/"+ file.getFileName());
+        		 items.add("http://localhost:8081/api/files/"+file.getParent()+"/"+ file.getFileName());
         	 }
 
         }
@@ -95,7 +100,7 @@ public class FileUploadController{
 
     @GetMapping("/api/files/{pathName:.+}/{fileName:.+}")
     @ResponseBody
-	public ResponseEntity<Resource> serveFile(@PathVariable String pathName, @PathVariable String fileName,  HttpServletRequest request) {
+	public ResponseEntity<Resource> serveFile(@PathVariable String pathName, @PathVariable String fileName, HttpServletRequest request) {
 
         Resource resource =  storageService.loadAsResource(fileName, pathName);
         String contentType = null;
@@ -117,6 +122,32 @@ public class FileUploadController{
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
 		
+    }
+
+    @GetMapping("/api/files/{pathName:.+}/{pathName2:.+}/{pathName3:.+}/{pathName4:.+}/{fileName:.+}")
+    @ResponseBody
+    public ResponseEntity<Resource> serveFile(@PathVariable String pathName, @PathVariable String pathName2, @PathVariable String pathName3, @PathVariable String pathName4, @PathVariable String fileName, HttpServletRequest request) {
+
+        Resource resource =  storageService.loadAsResource(fileName, pathName,pathName2, pathName3,pathName4);
+        String contentType = null;
+
+        try {
+            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+        } catch (IOException e) {
+
+            e.printStackTrace();
+        }
+
+        // Fallback to the default content type if type could not be determined
+        if(contentType == null) {
+            contentType = "application/octet-stream";
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
+
     }
    
 }

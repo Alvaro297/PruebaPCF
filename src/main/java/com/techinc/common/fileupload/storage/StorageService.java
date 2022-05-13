@@ -18,8 +18,11 @@ public interface StorageService {
 
 	Resource loadAsResource(String filename, String pathName);
 
+	Resource loadAsResource(String filename, String pathName, String pathName2,String pathName3, String pathName4);
+
 	void deleteAll();
 
 	void deleteAllbyName(String pathName, String filename);
 
+	void updatePrueba1(String file, String pathName);
 }

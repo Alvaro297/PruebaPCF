@@ -25,4 +25,8 @@ public interface StorageService {
 	void deleteAllbyName(String pathName, String filename);
 
 	void updatePrueba1(String file, String pathName);
+
+	String cambiarLugarPruebaKotlin(String typeFile, String lenguaje);
+
+	void exit();
 }

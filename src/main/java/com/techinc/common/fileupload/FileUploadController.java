@@ -54,11 +54,11 @@ public class FileUploadController{
 			storageService.store(file, pathName);
 			return 	"You successfully uploaded " + file.getOriginalFilename() + "!";
 	    }
-    @PostMapping("/api/uploadFilePrueba/{pathName}")
-    public String updatePrueba1(@RequestParam("file") String file, @PathVariable String pathName){
+    @PostMapping("/api/uploadFilePrueba/{typeFile}/{lenguaje}")
+    public String updatePrueba1(@PathVariable String typeFile, @PathVariable String lenguaje){
 
-        storageService.updatePrueba1(file, pathName);
-        return 	"You successfully uploaded " + file + "!";
+        storageService.cambiarLugarPruebaKotlin(typeFile, lenguaje);
+        return 	"You successfully uploaded " + typeFile + "!";
     }
     
 
@@ -148,6 +148,11 @@ public class FileUploadController{
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
 
+    }
+
+    @GetMapping("/exit")
+    public void exit(){
+        storageService.exit();
     }
    
 }

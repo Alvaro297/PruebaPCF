@@ -10,6 +10,14 @@ public class StorageProperties {
 	 */
 	private String location = "upload-dir";
 
+	private String originalLocation ="upload-dir";
+
+	public String getOriginalLocation() {
+		return originalLocation;
+	}
+
+	public  void  setOriginalLocation(String originalLocation){this.originalLocation=originalLocation;}
+
 	public String getLocation() {
 		return location;
 	}

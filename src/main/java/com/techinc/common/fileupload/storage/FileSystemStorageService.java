@@ -1,25 +1,28 @@
 package com.techinc.common.fileupload.storage;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.nio.file.*;
-import java.util.stream.Stream;
-
-import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
-//import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.*;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Locale;
+import java.util.stream.Stream;
+
+
 
 @Service
 public class FileSystemStorageService implements StorageService {
 
 	private final Path rootLocation;
+	private StorageProperties storageProperties;
 
 	@Autowired
 	public FileSystemStorageService(StorageProperties properties) {
@@ -91,6 +94,91 @@ public class FileSystemStorageService implements StorageService {
 			throw new StorageException("Failed to store file.", e);
 		}
 	}
+
+
+	@Override
+	public String cambiarLugarPruebaKotlin(String typeFile, String lenguaje) {
+		Path destinationFile = this.rootLocation.toAbsolutePath();
+		File origin;
+		File destination;
+
+		if (lenguaje.toLowerCase()=="kotlin"){
+			switch (typeFile.toLowerCase()){
+				case "interfaz":
+					origin = new File(destinationFile + "/ElementosKotlin/Interfaz/Interfaz.kt" );
+					destination = new File(destinationFile + "/Animal/src/main/kotlin");
+					if (origin.exists()) {
+						try {
+							InputStream in = new FileInputStream(origin);
+							OutputStream out = new FileOutputStream(destination);
+							byte[] buf = new byte[1024];
+							int len;
+							while ((len = in.read(buf)) > 0) {
+								out.write(buf, 0, len);
+							}
+							in.close();
+							out.close();
+
+						} catch (IOException ioe) {
+							ioe.printStackTrace();
+
+						}
+					} else {
+						return "Fichero inexistente";
+					}
+				case "clase"+"class":
+					origin = new File(destinationFile + "/ElementosKotlin/Class/Class.kt" );
+					destination = new File(destinationFile + "/Animal/src/main/kotlin");
+					if (origin.exists()) {
+						try {
+							InputStream in = new FileInputStream(origin);
+							OutputStream out = new FileOutputStream(destination);
+							byte[] buf = new byte[1024];
+							int len;
+							while ((len = in.read(buf)) > 0) {
+								out.write(buf, 0, len);
+							}
+							in.close();
+							out.close();
+
+						} catch (IOException ioe) {
+							ioe.printStackTrace();
+
+						}
+					} else {
+						return "Fichero inexistente";
+					}
+			}
+		}else if (lenguaje.toLowerCase()=="java") {
+
+		}
+
+
+		return "true";
+	}
+
+
+		/*String fileName = destinationFile.toString();
+		File origen = new File(fileName+"/"+pathName);
+		File destino = new File(fileName+"/ElementosKotlin/"+file);
+
+		try {
+			InputStream in = new FileInputStream(origen);
+			OutputStream out = new FileOutputStream(destino);
+
+			byte[] buf = new byte[1024];
+			int len;
+
+			while ((len = in.read(buf)) > 0) {
+				out.write(buf, 0, len);
+			}
+
+			in.close();
+			out.close();
+		} catch (IOException ioe){
+			ioe.printStackTrace();
+		}*/
+
 
 	@Override
 	public Stream<Path> loadAll() {
@@ -180,7 +268,6 @@ public class FileSystemStorageService implements StorageService {
 			Files.delete(_newPath);
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -188,6 +275,10 @@ public class FileSystemStorageService implements StorageService {
 		//FileUtils.forceDelete(FileUtils.getFile(file.normalize().toString()));
 	}
 
+	@Override
+	public void exit(){
+		storageProperties.setLocation(storageProperties.getOriginalLocation());
+	}
 	
 
 	@Override
@@ -199,4 +290,5 @@ public class FileSystemStorageService implements StorageService {
 			throw new StorageException("Could not initialize storage", e);
 		}
 	}
+
 }

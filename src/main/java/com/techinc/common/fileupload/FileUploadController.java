@@ -54,7 +54,7 @@ public class FileUploadController{
 			storageService.store(file, pathName);
 			return 	"You successfully uploaded " + file.getOriginalFilename() + "!";
 	    }
-    @PostMapping("/api/uploadFilePrueba/{typeFile}/{lenguaje}")
+    @GetMapping("/api/uploadFilePrueba/{typeFile}/{lenguaje}")
     public String updatePrueba1(@PathVariable String typeFile, @PathVariable String lenguaje){
 
         storageService.cambiarLugarPruebaKotlin(typeFile, lenguaje);

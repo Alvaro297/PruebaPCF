@@ -99,58 +99,36 @@ public class FileSystemStorageService implements StorageService {
 	@Override
 	public String cambiarLugarPruebaKotlin(String typeFile, String lenguaje) {
 		Path destinationFile = this.rootLocation.toAbsolutePath();
-		File origin;
-		File destination;
+		Path origin;
+		Path destination;
 
-		if (lenguaje.toLowerCase()=="kotlin"){
+		if (lenguaje.equalsIgnoreCase("kotlin")){
 			switch (typeFile.toLowerCase()){
 				case "interfaz":
-					origin = new File(destinationFile + "/ElementosKotlin/Interfaz/Interfaz.kt" );
-					destination = new File(destinationFile + "/Animal/src/main/kotlin");
-					if (origin.exists()) {
+					origin = Path.of(destinationFile + "/ElementosKotlin/Interfaz/Interfaz.kt" );
+					destination = Path.of(destinationFile + "/Animal/src/main/kotlin");
 						try {
-							InputStream in = new FileInputStream(origin);
-							OutputStream out = new FileOutputStream(destination);
-							byte[] buf = new byte[1024];
-							int len;
-							while ((len = in.read(buf)) > 0) {
-								out.write(buf, 0, len);
-							}
-							in.close();
-							out.close();
+							Files.copy(origin, destination.resolve(origin.getFileName()));
 
 						} catch (IOException ioe) {
 							ioe.printStackTrace();
 
 						}
-					} else {
-						return "Fichero inexistente";
-					}
+						break;
 				case "clase"+"class":
-					origin = new File(destinationFile + "/ElementosKotlin/Class/Class.kt" );
-					destination = new File(destinationFile + "/Animal/src/main/kotlin");
-					if (origin.exists()) {
+					origin = Path.of(destinationFile + "/ElementosKotlin/Class/Class.kt" );
+					destination = Path.of(destinationFile + "/Animal/src/main/kotlin");
 						try {
-							InputStream in = new FileInputStream(origin);
-							OutputStream out = new FileOutputStream(destination);
-							byte[] buf = new byte[1024];
-							int len;
-							while ((len = in.read(buf)) > 0) {
-								out.write(buf, 0, len);
-							}
-							in.close();
-							out.close();
-
+							Files.copy(origin, destination.resolve(origin.getFileName()));
 						} catch (IOException ioe) {
 							ioe.printStackTrace();
 
 						}
-					} else {
-						return "Fichero inexistente";
 					}
-			}
-		}else if (lenguaje.toLowerCase()=="java") {
+		}else if (lenguaje.equalsIgnoreCase("java")) {
 
+		}else{
+			return "Lenguaje no comprendido prueba con: Java o Kotlin";
 		}
 
 

@@ -37,7 +37,6 @@ import java.nio.file.Path;
 import com.techinc.common.fileupload.storage.StorageService;
 
 @RestController
-
 public class FileUploadController{
 
     private final StorageService storageService;
@@ -57,7 +56,7 @@ public class FileUploadController{
     @GetMapping("/api/uploadFilePrueba/{typeFile}/{lenguaje}")
     public String updatePrueba1(@PathVariable String typeFile, @PathVariable String lenguaje){
 
-        storageService.cambiarLugarPruebaKotlin(typeFile, lenguaje);
+        storageService.cambiarLugarPruebaKotlin(Optional.ofNullable(typeFile), lenguaje);
         return 	"You successfully uploaded " + typeFile + "!";
     }
     

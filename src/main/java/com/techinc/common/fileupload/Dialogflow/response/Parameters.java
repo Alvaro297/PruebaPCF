@@ -4,9 +4,19 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Optional;
+
 
 public class Parameters {
     @Getter
     @Setter
-    private List<String> parameters;
+    private Optional<List<String>> any;
+
+    @Getter
+    @Setter
+    private Optional<String> clases;
+
+    @Getter
+    @Setter
+    private String lenguajes;
 }

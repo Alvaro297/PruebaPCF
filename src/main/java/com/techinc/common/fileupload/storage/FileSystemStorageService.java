@@ -1,5 +1,6 @@
 package com.techinc.common.fileupload.storage;
 
+import com.techinc.common.fileupload.Dialogflow.response.Parameters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -7,13 +8,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.swing.text.html.Option;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 
@@ -64,99 +68,56 @@ public class FileSystemStorageService implements StorageService {
 		}
 	}
 
+
 	@Override
-	public void updatePrueba1(String file, String pathName) {
-		try {
-			if (file.isEmpty()) {
-				throw new StorageException("Failed to store empty file.");
-			}
-			if (pathName.isEmpty()) {
-				throw new StorageException("Path Name is required.");
-			}
-			Path destinationFile = this.rootLocation.toAbsolutePath();
+	public String cambiarNombre(Parameters parametros){
+		Path destinationFile = this.rootLocation.toAbsolutePath();
+		Path destiantion=Path.of(destinationFile+"/Animal/src/main/kotlin");
+		if (parametros.getLenguajes().equals("kotlin")){
+			if (destiantion.getFileName().compareTo(parametros.getAny().get().get(0)));
+		}else if (parametros.getLenguajes().equals("java")){
 
-
-			String fileName = destinationFile.toString();
-			Path _newPath = Paths.get( fileName + "/"+ pathName);
-			destinationFile  = Files.createDirectories(_newPath);
-
-			destinationFile = destinationFile.resolve(
-							Paths.get(file))
-					.normalize().toAbsolutePath();
-
-			if (destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
-				// This is a security check
-				throw new StorageException(
-						"Cannot store file outside current directory.");
-			}
-		}
-		catch (IOException e) {
-			throw new StorageException("Failed to store file.", e);
+		}else{
+			return "No hay ningun lenguaje";
 		}
 	}
 
 
 	@Override
-	public String cambiarLugarPruebaKotlin(String typeFile, String lenguaje) {
+	public String cambiarLugarPruebaKotlin(Optional<String> typeFile, String lenguaje) {
 		Path destinationFile = this.rootLocation.toAbsolutePath();
 		Path origin;
 		Path destination;
-
-		if (lenguaje.equalsIgnoreCase("kotlin")){
-			switch (typeFile.toLowerCase()){
-				case "interfaz":
-					origin = Path.of(destinationFile + "/ElementosKotlin/Interfaz/Interfaz.kt" );
+			if (lenguaje.equalsIgnoreCase("kotlin")) {
+				if ("interfaz".equals(typeFile)) {
+					origin = Path.of(destinationFile + "/ElementosKotlin/Interfaz/Interfaz.kt");
 					destination = Path.of(destinationFile + "/Animal/src/main/kotlin");
-						try {
-							Files.copy(origin, destination.resolve(origin.getFileName()));
+					try {
+						Files.copy(origin, destination.resolve(origin.getFileName()));
 
-						} catch (IOException ioe) {
-							ioe.printStackTrace();
+					} catch (IOException ioe) {
+						ioe.printStackTrace();
 
-						}
-						break;
-				case "clase"+"class":
-					origin = Path.of(destinationFile + "/ElementosKotlin/Class/Class.kt" );
-					destination = Path.of(destinationFile + "/Animal/src/main/kotlin");
-						try {
-							Files.copy(origin, destination.resolve(origin.getFileName()));
-						} catch (IOException ioe) {
-							ioe.printStackTrace();
-
-						}
 					}
-		}else if (lenguaje.equalsIgnoreCase("java")) {
+				} else if ("clase".equals(typeFile)) {
+					origin = Path.of(destinationFile + "/ElementosKotlin/Class/Class.kt");
+					destination = Path.of(destinationFile + "/Animal/src/main/kotlin");
+					try {
+						Files.copy(origin, destination.resolve(origin.getFileName()));
+					} catch (IOException ioe) {
+						ioe.printStackTrace();
 
-		}else{
-			return "Lenguaje no comprendido prueba con: Java o Kotlin";
-		}
+					}
+				}
+			} else if (lenguaje.equalsIgnoreCase("java")) {
 
-
-		return "true";
-	}
-
-
-		/*String fileName = destinationFile.toString();
-		File origen = new File(fileName+"/"+pathName);
-		File destino = new File(fileName+"/ElementosKotlin/"+file);
-
-		try {
-			InputStream in = new FileInputStream(origen);
-			OutputStream out = new FileOutputStream(destino);
-
-			byte[] buf = new byte[1024];
-			int len;
-
-			while ((len = in.read(buf)) > 0) {
-				out.write(buf, 0, len);
+			} else {
+				return "Lenguaje no comprendido prueba con: Java o Kotlin";
 			}
 
-			in.close();
-			out.close();
-		} catch (IOException ioe){
-			ioe.printStackTrace();
-		}*/
 
+			return "true";
+		}
 
 	@Override
 	public Stream<Path> loadAll() {

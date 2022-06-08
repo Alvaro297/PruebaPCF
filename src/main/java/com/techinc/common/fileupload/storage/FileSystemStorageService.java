@@ -1,6 +1,8 @@
 package com.techinc.common.fileupload.storage;
 
 import com.techinc.common.fileupload.Dialogflow.response.Parameters;
+import com.techinc.common.fileupload.funciones.Correo;
+import com.techinc.common.fileupload.funciones.EliminaryCambiar;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -8,18 +10,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.swing.text.html.Option;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
 import java.util.stream.Stream;
-
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 
 @Service
@@ -32,6 +31,12 @@ public class FileSystemStorageService implements StorageService {
 	public FileSystemStorageService(StorageProperties properties) {
 		this.rootLocation = Paths.get(properties.getLocation());
 	}
+
+	@Autowired
+	private Correo correo;
+
+	@Autowired
+	private EliminaryCambiar eliminar;
 
 	@Override
 	public void store(MultipartFile file, String pathName) {
@@ -72,24 +77,44 @@ public class FileSystemStorageService implements StorageService {
 	@Override
 	public String cambiarNombre(Parameters parametros){
 		Path destinationFile = this.rootLocation.toAbsolutePath();
-		Path destiantion=Path.of(destinationFile+"/Animal/src/main/kotlin");
 		if (parametros.getLenguajes().equals("kotlin")){
-			if (destiantion.getFileName().compareTo(parametros.getAny().get().get(0)));
+			Path destiantion=Path.of(destinationFile+"/Animal/src/main/kotlin/");
+			File file1=new File(destiantion+parametros.getAny().get(0));
+			File file2=new File(destiantion+parametros.getAny().get(1));
+			if (file1.exists()&&!file2.exists()){
+				boolean sucess=file1.renameTo(file2);
+				if (!sucess){
+					System.out.println("Error al cambiar de nombre");
+				}
+			}else{
+				System.out.println("Error fichero ya creado");
+			}
 		}else if (parametros.getLenguajes().equals("java")){
-
+			Path destiantion=Path.of(destinationFile+"/Java/src/main/java/");
+			File file1=new File(destiantion+parametros.getAny().get(0));
+			File file2=new File(destiantion+parametros.getAny().get(1));
+			if (file1.exists()&&!file2.exists()){
+				boolean sucess=file1.renameTo(file2);
+				if (!sucess){
+					System.out.println("Error al cambiar de nombre");
+				}
+			}else{
+				System.out.println("Error fichero ya creado");
+			}
 		}else{
 			return "No hay ningun lenguaje";
 		}
+		return "Devuelto correctamente";
 	}
 
 
 	@Override
-	public String cambiarLugarPruebaKotlin(Optional<String> typeFile, String lenguaje) {
+	public String cambiarLugarPruebaKotlin(String typeFile, String lenguaje) {
 		Path destinationFile = this.rootLocation.toAbsolutePath();
 		Path origin;
 		Path destination;
 			if (lenguaje.equalsIgnoreCase("kotlin")) {
-				if ("interfaz".equals(typeFile)) {
+				if ("interfaz".equalsIgnoreCase(typeFile)||"interface".equalsIgnoreCase(typeFile)) {
 					origin = Path.of(destinationFile + "/ElementosKotlin/Interfaz/Interfaz.kt");
 					destination = Path.of(destinationFile + "/Animal/src/main/kotlin");
 					try {
@@ -99,7 +124,7 @@ public class FileSystemStorageService implements StorageService {
 						ioe.printStackTrace();
 
 					}
-				} else if ("clase".equals(typeFile)) {
+				} else if ("clase".equalsIgnoreCase(typeFile)||"class".equalsIgnoreCase(typeFile)) {
 					origin = Path.of(destinationFile + "/ElementosKotlin/Class/Class.kt");
 					destination = Path.of(destinationFile + "/Animal/src/main/kotlin");
 					try {
@@ -110,7 +135,26 @@ public class FileSystemStorageService implements StorageService {
 					}
 				}
 			} else if (lenguaje.equalsIgnoreCase("java")) {
+				if ("interfaz".equalsIgnoreCase(typeFile)||"interface".equalsIgnoreCase(typeFile)) {
+					origin = Path.of(destinationFile + "/ElementosJava/Interfaz/Interfaz.java");
+					destination = Path.of(destinationFile + "/Java/src/main/kotlin");
+					try {
+						Files.copy(origin, destination.resolve(origin.getFileName()));
 
+					} catch (IOException ioe) {
+						ioe.printStackTrace();
+
+					}
+				} else if ("clase".equalsIgnoreCase(typeFile)||"class".equalsIgnoreCase(typeFile)) {
+					origin = Path.of(destinationFile + "/ElementosJava/Class/Class.kt");
+					destination = Path.of(destinationFile + "/Java/src/main/kotlin");
+					try {
+						Files.copy(origin, destination.resolve(origin.getFileName()));
+					} catch (IOException ioe) {
+						ioe.printStackTrace();
+
+					}
+				}
 			} else {
 				return "Lenguaje no comprendido prueba con: Java o Kotlin";
 			}
@@ -118,72 +162,17 @@ public class FileSystemStorageService implements StorageService {
 
 			return "true";
 		}
-
 	@Override
-	public Stream<Path> loadAll() {
-		try {
-			return Files.walk(this.rootLocation, 6)
-				.filter(path -> !path.equals(this.rootLocation))
-				.map(this.rootLocation::relativize);
-		}
-		catch (IOException e) {
-			throw new StorageException("Failed to read stored files", e);
-		}
-
-	}
-
-	@Override
-	public Path load(String filename) {
-		return rootLocation.resolve(filename);
-	}
-
-	@Override
-	public Resource loadAsResource(String filename, String pathName) {
-		try {
-			Path file = this.rootLocation.toAbsolutePath();
-			
-			
-			String fileName = file.toString();
-			
-			Path _newPath = Paths.get( fileName + "/"+ pathName + "/" + filename);
-			Resource resource = new UrlResource(_newPath.toUri());
-			if (resource.exists() || resource.isReadable()) {
-				return resource;
-			}
-			else {
-				throw new StorageFileNotFoundException(
-						"Could not read file: " + filename);
-
-			}
-		}
-		catch (MalformedURLException e) {
-			throw new StorageFileNotFoundException("Could not read file: " + filename, e);
+	public void eliminarFichero(Parameters parameters){
+		Path destinationFile = this.rootLocation.toAbsolutePath();
+		if (parameters.getLenguajes().equalsIgnoreCase("kotlin")){
+			eliminar.eliminarKotlin(parameters);
+		}else if (parameters.getLenguajes().equalsIgnoreCase("java")){
+			eliminar.eliminarJava(parameters);
 		}
 	}
 
-	@Override
-	public Resource loadAsResource(String filename, String pathName, String pathName2, String pathName3, String pathName4) {
-		try {
-			Path file = this.rootLocation.toAbsolutePath();
 
-
-			String fileName = file.toString();
-
-			Path _newPath = Paths.get( fileName + "/"+ pathName + "/" +pathName2+"/"+pathName3+"/"+pathName4+"/"+ filename);
-			Resource resource = new UrlResource(_newPath.toUri());
-			if (resource.exists() || resource.isReadable()) {
-				return resource;
-			}
-			else {
-				throw new StorageFileNotFoundException(
-						"Could not read file: " + filename);
-
-			}
-		}
-		catch (MalformedURLException e) {
-			throw new StorageFileNotFoundException("Could not read file: " + filename, e);
-		}
-	}
 
 	@Override
 	public void deleteAll() {
@@ -191,34 +180,62 @@ public class FileSystemStorageService implements StorageService {
 		init();
 	}
 
-	@Override
-	public void deleteAllbyName(String pathName, String filename) {
 		
-		Path file = this.rootLocation.toAbsolutePath();
-		//File fileToDelete = FileUtils.getFile(file.toAbsolutePath());
-		String fileName = file.toString();
-		
-		Path _newPath = Paths.get( fileName + "/"+ pathName + "/" + filename);
-		
-		
-		Resource resource;
-		try {
-			resource = new UrlResource(_newPath.toUri());
-			Files.delete(_newPath);
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		
-		//FileUtils.forceDelete(FileUtils.getFile(file.normalize().toString()));
-	}
+		//FileUtils.forceDelete(FileUtils.getFile(file.normalize().toString()))
 
 	@Override
 	public void exit(){
 		storageProperties.setLocation(storageProperties.getOriginalLocation());
 	}
 	
+
+	@Override
+	public void creacionZip(Parameters parameters) throws Exception {
+		Path destinationFile = this.rootLocation.toAbsolutePath();
+		if (parameters.getLenguajes().equalsIgnoreCase("kotlin")){
+			String nuevoParent = destinationFile+"/Animal";
+			String destino = nuevoParent + ".zip";
+			comprimir(nuevoParent, destino);
+			correo.correoKotlin();
+
+		}else if (parameters.getLenguajes().equalsIgnoreCase("java")){
+			String nuevoParent = destinationFile+"/Java";
+			String destino = nuevoParent + ".zip";
+			comprimir(nuevoParent, destino);
+			correo.correoJava();
+		}
+	}
+	public void comprimir(String archivo, String archivoZIP) throws Exception {
+		ZipOutputStream zip = new ZipOutputStream(new FileOutputStream(archivoZIP));
+		agregarCarpeta("", archivo, zip);
+		zip.flush();
+		zip.close();
+	}
+	public void agregarCarpeta(String ruta, String carpeta, ZipOutputStream zip) throws Exception {
+		File directorio = new File(carpeta);
+		for (String nombreArchivo : directorio.list()) {
+			if (ruta.equals("")) {
+				agregarArchivo(directorio.getName(), carpeta + "/" + nombreArchivo, zip);
+			} else {
+				agregarArchivo(ruta + "/" + directorio.getName(), carpeta + "/" + nombreArchivo, zip);
+			}
+		}
+	}
+	public void agregarArchivo(String ruta, String directorio, ZipOutputStream zip) throws Exception {
+		File archivo = new File(directorio);
+		if (archivo.isDirectory()) {
+			agregarCarpeta(ruta, directorio, zip);
+		} else {
+			byte[] buffer = new byte[4096];
+			int leido;
+			FileInputStream entrada = new FileInputStream(archivo);
+			zip.putNextEntry(new ZipEntry(ruta + "/" + archivo.getName()));
+			while ((leido = entrada.read(buffer)) > 0) {
+				zip.write(buffer, 0, leido);
+			}
+		}
+	}
+
 
 	@Override
 	public void init() {

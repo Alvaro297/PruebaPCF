@@ -6,5 +6,5 @@ import lombok.Setter;
 public class DialogFlowRequest {
     @Getter
     @Setter
-    private QueryRequest queryRequest;
+    private QueryResult queryResult;
 }

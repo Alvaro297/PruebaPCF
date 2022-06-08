@@ -1,22 +1,20 @@
 package com.techinc.common.fileupload.Dialogflow.DialogFlowRequest;
 
 import com.techinc.common.fileupload.Dialogflow.response.FulfillmentMessages;
-import com.techinc.common.fileupload.Dialogflow.response.FulfillmentText;
 import com.techinc.common.fileupload.Dialogflow.response.Parameters;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.lang.reflect.Parameter;
-import java.util.Optional;
+import java.util.List;
 
-public class QueryRequest {
+public class QueryResult {
     @Getter
     @Setter
-    private FulfillmentMessages fulfillmentMessages;
+    private List<FulfillmentMessages> fulfillmentMessages;
 
     @Getter
     @Setter
-    private FulfillmentText fulfillmentText;
+    private String fulfillmentText;
 
     @Getter
     @Setter

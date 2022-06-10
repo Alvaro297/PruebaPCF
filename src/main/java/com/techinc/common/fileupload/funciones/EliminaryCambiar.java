@@ -4,6 +4,8 @@ import com.techinc.common.fileupload.Dialogflow.response.Parameters;
 import com.techinc.common.fileupload.storage.StorageProperties;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -37,11 +39,55 @@ public class EliminaryCambiar {
             System.out.println("Fichero no existente");
     }
 
-    public void cambiarJava(){
+    public void cambiarKotlin(String typeFile, String lenguaje){
+        Path destinationFile = this.rootLocation.toAbsolutePath();
+        Path origin;
+        Path destination;
+        if ("interfaz".equalsIgnoreCase(typeFile)||"interface".equalsIgnoreCase(typeFile)) {
+            origin = Path.of(destinationFile + "/ElementosKotlin/Interfaz/Interfaz.kt");
+            destination = Path.of(destinationFile + "/Animal/src/main/kotlin");
+            try {
+                Files.copy(origin, destination.resolve(origin.getFileName()));
 
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+
+            }
+        } else if ("clase".equalsIgnoreCase(typeFile)||"class".equalsIgnoreCase(typeFile)) {
+            origin = Path.of(destinationFile + "/ElementosKotlin/Class/Class.kt");
+            destination = Path.of(destinationFile + "/Animal/src/main/kotlin");
+            try {
+                Files.copy(origin, destination.resolve(origin.getFileName()));
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+
+            }
+        }
     }
 
-    public void cambiarKotlin(){
+    public void cmbiarJava(String typeFile, String lenguaje){
+        Path destinationFile = this.rootLocation.toAbsolutePath();
+        Path origin;
+        Path destination;
+        if ("interfaz".equalsIgnoreCase(typeFile)||"interface".equalsIgnoreCase(typeFile)) {
+            origin = Path.of(destinationFile + "/ElementosJava/Interfaz/Interfaz.java");
+            destination = Path.of(destinationFile + "/Java/src/main/kotlin");
+            try {
+                Files.copy(origin, destination.resolve(origin.getFileName()));
 
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+
+            }
+        } else if ("clase".equalsIgnoreCase(typeFile)||"class".equalsIgnoreCase(typeFile)) {
+            origin = Path.of(destinationFile + "/ElementosJava/Class/Class.kt");
+            destination = Path.of(destinationFile + "/Java/src/main/kotlin");
+            try {
+                Files.copy(origin, destination.resolve(origin.getFileName()));
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+
+            }
+        }
     }
 }

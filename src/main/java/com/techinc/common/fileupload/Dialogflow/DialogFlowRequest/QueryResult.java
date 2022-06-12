@@ -19,4 +19,5 @@ public class QueryResult {
     @Getter
     @Setter
     private Parameters parameters;
+
 }

@@ -34,13 +34,13 @@ public class DialogflowController {
                 storageService.cambiarLugarPruebaKotlin(parametros.getClases(), parametros.getLenguajes());
                 break;
             case "Nombre cambiado":
-                storageService.cambiarNombre(parametros);
+                storageService.cambiarNombre(parametros.getAny(), parametros.getLenguajes());
                 break;
             case "Eliminado el fichero":
-                storageService.eliminarFichero(parametros);
+                storageService.eliminarFichero(parametros.getAny(), parametros.getLenguajes());
                 break;
             case "Su programa se ha entregado a su correo anteriormente solicitado":
-                storageService.creacionZip(parametros);
+                storageService.creacionZip(parametros.getAny(), parametros.getGmail(), parametros.getLenguajes());
                 break;
         }
     }

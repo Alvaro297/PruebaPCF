@@ -1,4 +1,4 @@
 package com.techinc.common.fileupload
 
-class Class {
+class `class` {
 }

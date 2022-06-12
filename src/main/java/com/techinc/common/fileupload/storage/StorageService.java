@@ -5,6 +5,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -12,17 +13,13 @@ public interface StorageService {
 
 	void init();
 
-	void store(MultipartFile file, String pathName);
-
-	void deleteAll();
-
 	String cambiarLugarPruebaKotlin(String typeFile, String lenguaje);
 
-	String cambiarNombre(Parameters parametros);
 
-	void exit();
+	String cambiarNombre(List<String> any, String lenguajes);
 
-	void eliminarFichero(Parameters parameters);
 
-	void  creacionZip(Parameters parameters) throws Exception;
+	void  creacionZip(List<String> any, String gmail, String lenguaje) throws Exception;
+
+	void eliminarFichero(List<String> any, String lenguajes);
 }

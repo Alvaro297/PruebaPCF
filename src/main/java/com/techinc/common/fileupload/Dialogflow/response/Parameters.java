@@ -13,7 +13,10 @@ public class Parameters {
 
     private List<String> any;
     private String clases;
+    private String gmail;
     private String lenguajes;
+    private String eliminar;
+
 
     @JsonProperty("any")
     public List<String> getAny() { return any; }
@@ -25,9 +28,21 @@ public class Parameters {
     @JsonProperty("Clases")
     public void setClases(String value) { this.clases = value; }
 
+    @JsonProperty("Gmail")
+    public String getGmail() { return gmail; }
+    @JsonProperty("Gmail")
+    public void setGmail(String value) { this.gmail = value; }
+
     @JsonProperty("Lenguajes")
     public String getLenguajes() { return lenguajes; }
     @JsonProperty("Lenguajes")
     public void setLenguajes(String value) { this.lenguajes = value; }
+
+    @JsonProperty("Eliminar")
+    public String getEliminar() { return eliminar; }
+    @JsonProperty("Eliminar")
+    public void setEliminar(String value) { this.eliminar = value; }
+
+
 }
 

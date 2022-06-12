@@ -1,5 +1,8 @@
 package com.techinc.common.fileupload.storage;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.flogger.Flogger;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties("storage")
@@ -8,22 +11,12 @@ public class StorageProperties {
 	/**
 	 * Folder location for storing files
 	 */
+	@Getter
+	@Setter
 	private String location = "upload-dir";
 
+	@Getter
+	@Setter
 	private String originalLocation ="upload-dir";
-
-	public String getOriginalLocation() {
-		return originalLocation;
-	}
-
-	public  void  setOriginalLocation(String originalLocation){this.originalLocation=originalLocation;}
-
-	public String getLocation() {
-		return location;
-	}
-
-	public void setLocation(String location) {
-		this.location = location;
-	}
 
 }

@@ -20,4 +20,7 @@ public class QueryResult {
     @Setter
     private Parameters parameters;
 
+    @Getter
+    @Setter
+    private String queryText;
 }

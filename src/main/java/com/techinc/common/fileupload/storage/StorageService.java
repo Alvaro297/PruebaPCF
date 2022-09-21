@@ -15,11 +15,9 @@ public interface StorageService {
 
 	String cambiarLugarPruebaKotlin(String typeFile, String lenguaje);
 
-
 	String cambiarNombre(List<String> any, String lenguajes);
 
-
-	void  creacionZip(List<String> any, String gmail, String lenguaje) throws Exception;
+	void  creacionZip(List<String> any, String gmail, String lenguaje,String salida) throws Exception;
 
 	void eliminarFichero(List<String> any, String lenguajes);
 }

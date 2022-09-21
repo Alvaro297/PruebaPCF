@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -40,7 +41,7 @@ public class FileSystemStorageService implements StorageService {
 	public String cambiarNombre(List<String> any, String lenguajes){
 		Path destinationFile = this.rootLocation.toAbsolutePath();
 		if (lenguajes.equalsIgnoreCase("kotlin")){
-			Path destiantion=Path.of(destinationFile+"/Animal/src/main/kotlin/");
+			Path destiantion=Path.of(destinationFile+"/Kotlin/src/main/kotlin/");
 			File file1=new File(destiantion+"/"+any.get(0)+".kt");
 			File file2=new File(destiantion+"/"+any.get(1)+".kt");
 			if (file1.exists()&&!file2.exists()){
@@ -75,7 +76,7 @@ public class FileSystemStorageService implements StorageService {
 			if (lenguaje.equalsIgnoreCase("kotlin")) {
 				if ("interfaz".equalsIgnoreCase(typeFile)||"interface".equalsIgnoreCase(typeFile)) {
 					origin = Path.of(destinationFile + "/ElementosKotlin/Interfaz/interfaz.kt");
-					destination = Path.of(destinationFile + "/Animal/src/main/kotlin");
+					destination = Path.of(destinationFile + "/Kotlin/src/main/kotlin");
 					try {
 						Files.copy(origin, destination.resolve(origin.getFileName()));
 
@@ -85,7 +86,7 @@ public class FileSystemStorageService implements StorageService {
 					}
 				} else if ("clase".equalsIgnoreCase(typeFile)||"class".equalsIgnoreCase(typeFile)) {
 					origin = Path.of(destinationFile + "/ElementosKotlin/Class/class.kt");
-					destination = Path.of(destinationFile + "/Animal/src/main/kotlin");
+					destination = Path.of(destinationFile + "/Kotlin/src/main/kotlin");
 					try {
 						Files.copy(origin, destination.resolve(origin.getFileName()));
 					} catch (IOException ioe) {
@@ -136,19 +137,27 @@ public class FileSystemStorageService implements StorageService {
 	
 
 	@Override
-	public void creacionZip(List<String> any, String gmail, String lenguaje) throws Exception {
+	public void creacionZip(List<String> any, String gmail, String lenguaje, String salida) throws Exception {
 		Path destinationFile = this.rootLocation.toAbsolutePath();
 		if (lenguaje.equalsIgnoreCase("kotlin")){
-			String nuevoParent = destinationFile+"/Animal";
+			if (salida.toLowerCase().contains("spring")){
+				correoKotlin(any.get(0),gmail,salida);
+			}else{
+			String nuevoParent = destinationFile+"/Kotlin";
 			String destino = nuevoParent + ".zip";
 			comprimir(nuevoParent, destino);
-			correoKotlin(any.get(0),gmail);
+			correoKotlin(any.get(0),gmail,salida);
+			}
 
 		}else if (lenguaje.equalsIgnoreCase("java")){
-			String nuevoParent = destinationFile+"/Java";
-			String destino = nuevoParent + ".zip";
-			comprimir(nuevoParent, destino);
-			correoJava(any.get(0),gmail);
+			if (salida.toLowerCase().contains("spring")){
+				correoJava(any.get(0),gmail,salida);
+			}else {
+				String nuevoParent = destinationFile + "/Java";
+				String destino = nuevoParent + ".zip";
+				comprimir(nuevoParent, destino);
+				correoJava(any.get(0), gmail, salida);
+			}
 		}
 	}
 
@@ -185,11 +194,12 @@ public class FileSystemStorageService implements StorageService {
 		}
 	}
 
-	public void correoJava(String a, String gmail) throws MessagingException {
+	public void correoJava(String a, String gmail, String salida) throws MessagingException {
 		Path destinationFile = this.rootLocation.toAbsolutePath();
 		String correo="alvarofalagan29@gmail.com";
 		String contra="Alvaro2908";
-		String correoDestino=a+gmail;
+		String b=a.toLowerCase().replace(" ","");
+		String correoDestino=b.replace("á","a")+gmail;
 
 		Properties p =new Properties();
 		p.put("mail.smtp.host","smtp.office365.com");
@@ -202,8 +212,13 @@ public class FileSystemStorageService implements StorageService {
 		BodyPart text =new MimeBodyPart();
 		text.setText("Ejemplo");
 		BodyPart adjunto =new MimeBodyPart();
-		adjunto.setDataHandler(new DataHandler(new FileDataSource(destinationFile+"/Java.zip")));
-		adjunto.setFileName("Buenodia.zip");
+		if (salida.toLowerCase().contains("spring")){
+			adjunto.setDataHandler(new DataHandler(new FileDataSource(destinationFile+"/Spring.zip")));
+			adjunto.setFileName("Spring.zip");
+		}else{
+			adjunto.setDataHandler(new DataHandler(new FileDataSource(destinationFile+"/Java.zip")));
+			adjunto.setFileName("Java.zip");
+		}
 		MimeMultipart m=new MimeMultipart();
 		m.addBodyPart(text);
 		m.addBodyPart(adjunto);
@@ -220,12 +235,13 @@ public class FileSystemStorageService implements StorageService {
 		t.close();
 	}
 
-	public void correoKotlin(String a, String gmail) throws MessagingException {
+	public void correoKotlin(String a, String gmail, String salida) throws MessagingException {
 		Path destinationFile = this.rootLocation.toAbsolutePath();
 
 		String correo="alvarofalagan29@gmail.com";
 		String contra="Alvaro2908";
-		String correoDestino=a+gmail;
+		String b=a.toLowerCase().replace(" ","");
+		String correoDestino=b.replace("á","a")+gmail;
 
 		Properties p =new Properties();
 		p.put("mail.smtp.host","smtp.office365.com");
@@ -238,8 +254,13 @@ public class FileSystemStorageService implements StorageService {
 		BodyPart text =new MimeBodyPart();
 		text.setText("Ejemplo");
 		BodyPart adjunto =new MimeBodyPart();
-		adjunto.setDataHandler(new DataHandler(new FileDataSource(destinationFile+"/Animal.zip")));
-		adjunto.setFileName("Buenodia.zip");
+		if (salida.toLowerCase().contains("spring")){
+			adjunto.setDataHandler(new DataHandler(new FileDataSource(destinationFile+"/SpringKotlin.zip")));
+			adjunto.setFileName("SpringKotlin.zip");
+		}else{
+			adjunto.setDataHandler(new DataHandler(new FileDataSource(destinationFile+"/Kotlin.zip")));
+			adjunto.setFileName("Kotlin.zip");
+		}
 		MimeMultipart m=new MimeMultipart();
 		m.addBodyPart(text);
 		m.addBodyPart(adjunto);
@@ -258,7 +279,7 @@ public class FileSystemStorageService implements StorageService {
 
 	public void eliminarKotlin(List<String> any){
 		Path destinationFile = this.rootLocation.toAbsolutePath();
-		Path destiantion=Path.of(destinationFile+"/Animal/src/main/kotlin/");
+		Path destiantion=Path.of(destinationFile+"/Kotlin/src/main/kotlin/");
 		File file1=new File(destiantion+"\\"+any.get(0)+".kt");
 		if (file1.exists()){
 			file1.delete();
